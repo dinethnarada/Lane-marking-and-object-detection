@@ -93,9 +93,12 @@ def hough_lines(img, indicies, rhos, thetas):
         cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
 def hough_transform(canny_img):
-    shapes = cv2.imread('output/scaled-output-dashcam_view_1.jpg')
     n_list = non_zero_index_list(canny_img)
     H, thetas, rhos = hough_line_acc(canny_img,n_list)
     indicies, H = hough_peaks(H, 3, nhood_size=11) 
-    hough_lines(shapes,indicies, rhos, thetas)
+    return indicies,rhos,thetas
+    
+def superimpose(indicies, rhos, thetas):
+    shapes = cv2.imread('output/scaled-output-dashcam_view_1.jpg')
+    hough_lines(shapes, indicies, rhos, thetas)
     return shapes

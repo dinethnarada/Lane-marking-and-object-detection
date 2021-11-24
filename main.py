@@ -8,8 +8,7 @@ from canny_edge_detector import edge_detect,gaussian_filter
 from transform import resize
 from normalize import normalize_intensity
 from filters import filter_func
-#from hough import hough
-from hough_transform import hough_transform
+from hough_transform import hough_transform,superimpose
 
 # Function - Display the images
 # Return - None
@@ -93,13 +92,12 @@ def main_170050R():
         save_imgs(edge_detected_img, img_name, img_format,"edge")
 
         # Step 7 - Apply Hough Transform
-        # hough_img = hough(edge_detected_img)
-        # print("hough shape",np.array(hough_img).shape)
-        # save_imgs(hough_img, img_name, img_format,"hough")
+        indicies,rhos,thetas = hough_transform(edge_detected_img)
 
-        hough_img = hough_transform(edge_detected_img)
-        print("hough shape",np.array(hough_img).shape)
-        save_imgs(hough_img, img_name, img_format,"hough")
+        # Step 8 - Superimpose the lanes by red color
+        superimpose_img = superimpose(indicies,rhos,thetas)
+        print("hough shape",np.array(superimpose_img).shape)
+        save_imgs(superimpose_img, img_name, img_format,"hough")
     return
 
 
