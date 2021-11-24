@@ -41,7 +41,7 @@ def load_img(img_path,path):
     return gray_img,input_img
 
 def save_imgs(image, filename, img_format,file_type):
-    if(file_type!='normalized' and file_type!='median'):
+    if(file_type!='normalized' and file_type!='median' and file_type!='guassian'):
         output_img = np.array(image, dtype=np.uint8)
     else:
         output_img = np.array(image)
