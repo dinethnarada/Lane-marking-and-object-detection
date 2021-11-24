@@ -1,6 +1,8 @@
 import os
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
+
 from utils import gray_scale
 from canny_edge_detector import edge_detect,gaussian_filter
 from transform import resize
@@ -46,9 +48,14 @@ def save_imgs(image, filename, img_format,file_type):
         output_img = np.array(image)
     window_name = "Detected Image"
     image_display(output_img, window_name)
+
     current_dir = os.path.dirname(os.path.realpath(__file__))
     filename = current_dir+"/output/"+file_type+"-output-"+filename+"."+img_format
-    cv2.imwrite(filename, output_img)
+    #cv2.imwrite(filename, output_img)
+    if(file_type!='hough'):
+        plt.imsave(filename,image,cmap='gray')
+    else:
+        cv2.imwrite(filename, output_img)
 
 # Function - Main Function
 def main_170050R():
