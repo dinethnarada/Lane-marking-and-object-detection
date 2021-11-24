@@ -2,9 +2,10 @@ import os
 import numpy as np
 import cv2
 import math
-from utils import select_sub_mat
+from utils import select_sub_mat,wrap
 
-
+# Function - Convolution input image with guassian kernel
+# Return - Convolute image
 def convolution(input_img, kernel):
     n = len(input_img)
     m = len(input_img[0])
@@ -34,18 +35,6 @@ def sum_mul(sub_mat, kernel, kernel_NXN):
         for j in range(kernel_NXN):
             sum_mul += sub_mat[i][j]*kernel[i][j]
     return sum_mul
-
-
-def wrap(input_img, n, m, wrap_size):
-    wrapped_img = []
-    for r in range(n):
-        wrapped_row = [input_img[r][-1]]*wrap_size + input_img[r]+[input_img[r][-1]]*wrap_size
-        wrapped_img.append(wrapped_row)
-    for iter in range(wrap_size):
-        wrapped_img.insert(0, wrapped_img[-1])
-        wrapped_img.append(wrapped_img[0])
-    return wrapped_img
-
 
 def mat_hypot(mat_x, mat_y):
     mat_x_n = len(mat_x)
@@ -97,16 +86,16 @@ def gaussian_kernel(kernel_NXN, sigma):
     return kernel
 
 # step 2:filter image with agaussian filter
-
-
+# Function - Guassian Mean Filter
+# Params - Image, sigma, kernel size
+# Return - Filtered image array
+# Description - Create a guassian kernel and convolute both
 def gaussian_filter(input_img, sigma, kernel_NXN):
     kernel = gaussian_kernel(kernel_NXN, sigma)
     filtered_img = convolution(input_img, kernel)
     return filtered_img
 
 # step 3:estimate gradient strength and direction
-
-
 def gradient(filtered_img):
     mx = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]
     my = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
@@ -120,8 +109,6 @@ def gradient(filtered_img):
     return (strength_mat, direction_mat)
 
 # step 4:non maxima suppression
-
-
 def non_maxima_suppression(strength_mat, direction_mat):
     n = len(strength_mat)
     m = len(strength_mat[0])
@@ -148,8 +135,6 @@ def max_mat(mat):
     return max([max(row) for row in mat])
 
 # step 5:dual threshold
-
-
 def dual_threshold(suppressed_img, high, low):
     high_threshold = max_mat(suppressed_img)*high
     low_threshold = high*low
@@ -181,14 +166,11 @@ def dual_threshold(suppressed_img, high, low):
                     linked_mat[i][j] = 0
     return linked_mat
 
-# kernel_NXN : size of kernel
-# high,low : high,low threshold ratios
-
-
+# Function - Apply Canny edge detection algorithm
+# Params - Image, High value, Low Value, Kernel Size, Sigma value
 def edge_detect(filtered_img, high, low, kernel_NXN, sigma):
     kernel_NXN = kernel_NXN
     sigma = sigma
-    # filtered_img=gaussian_filter(input_img,sigma,kernel_NXN)
     strength_mat, direction_mat = gradient(filtered_img)
     suppressed_img = non_maxima_suppression(strength_mat, direction_mat)
     linked_img = dual_threshold(suppressed_img, high, low)
