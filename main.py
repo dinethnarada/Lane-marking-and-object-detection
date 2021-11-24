@@ -49,7 +49,7 @@ def save_imgs(image, filename, img_format,file_type):
     image_display(output_img, window_name)
 
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    filename = current_dir+"/output/"+file_type+"-output-"+filename+"."+img_format
+    filename = current_dir+"/output/"+file_type+"."+img_format
     #cv2.imwrite(filename, output_img)
     if(file_type!='hough'):
         plt.imsave(filename,image,cmap='gray')
@@ -97,7 +97,7 @@ def main_170050R():
         # Step 8 - Superimpose the lanes by red color
         superimpose_img = superimpose(indicies,rhos,thetas)
         print("hough shape",np.array(superimpose_img).shape)
-        save_imgs(superimpose_img, img_name, img_format,"hough")
+        save_imgs(superimpose_img, img_name, img_format,"Lane_170050R")
     return
 
 

@@ -1,6 +1,8 @@
 import math
 import cv2
 
+# Function - Calculate Non zero values indexes list
+# Params - Image
 def non_zero_index_list(image):
     h = len(image)
     w = len(image[0])
@@ -11,6 +13,9 @@ def non_zero_index_list(image):
                 l1.append([eh,ew])
     return l1
 
+# Function - Calculate maximum values in list
+# Params - List
+# Return - indexes of maximum value in list
 def find_maximun(H):
     current = 0
     for x in range(len(H)):
@@ -20,6 +25,9 @@ def find_maximun(H):
                 ix,iy = x,y
     return ix,iy
 
+# Function - Create the hough space
+# Params - Canny edges list, non zero values list
+# Return - Hough Space, rhos list and theta list
 def hough_line_acc(canny, non_zero_index_list):
     height, width = len(canny), len(canny[0])
     diagonal = math.ceil(math.sqrt(height**2+width**2))
@@ -42,7 +50,10 @@ def hough_line_acc(canny, non_zero_index_list):
             H[c_rho][j] += 1
     return H,thetas,rhos
 
-def hough_peaks(H, num_peaks, threshold=0, nhood_size=3):
+# Function - Calculate Peak values in the hough space
+# Params - Hough Space, Expected peaks, thresold, neigbourhood size
+# Return - Hough space and Peak indices List
+def hough_peaks(H, num_peaks, neigbour_size=3):
     indicies = []
     newH = H.copy()
     for i in range(num_peaks):
@@ -52,17 +63,17 @@ def hough_peaks(H, num_peaks, threshold=0, nhood_size=3):
 
         # split x,y coordinates
         idx_y, idx_x = maxX, maxY 
-        if (idx_x - (nhood_size/2)) < 0: min_x = 0
-        else: min_x = idx_x - (nhood_size/2)
+        if (idx_x - (neigbour_size/2)) < 0: min_x = 0
+        else: min_x = idx_x - (neigbour_size/2)
 
-        if ((idx_x + (nhood_size/2) + 1) > len(H[0])): max_x = len(H[0])
-        else: max_x = idx_x + (nhood_size/2) + 1
+        if ((idx_x + (neigbour_size/2) + 1) > len(H[0])): max_x = len(H[0])
+        else: max_x = idx_x + (neigbour_size/2) + 1
 
-        if (idx_y - (nhood_size/2)) < 0: min_y = 0
-        else: min_y = idx_y - (nhood_size/2)
+        if (idx_y - (neigbour_size/2)) < 0: min_y = 0
+        else: min_y = idx_y - (neigbour_size/2)
 
-        if ((idx_y + (nhood_size/2) + 1) > len(H)):max_y = len(H)
-        else: max_y = idx_y + (nhood_size/2) + 1
+        if ((idx_y + (neigbour_size/2) + 1) > len(H)):max_y = len(H)
+        else: max_y = idx_y + (neigbour_size/2) + 1
 
         for x in range(int(min_x), int(max_x)):
             for y in range(int(min_y), int(max_y)):
@@ -74,6 +85,9 @@ def hough_peaks(H, num_peaks, threshold=0, nhood_size=3):
     print(indicies)
     return indicies, H
 
+# Function - Recongnize the Linear function parameters and Draw the red lines
+# Params - Image, Peak indicies list, rhos list, thetas list
+# Return - None
 def hough_lines(img, indicies, rhos, thetas):
     ''' A function that takes indicies a rhos table and thetas table and draws
         lines on the input images that correspond to these values. '''
@@ -92,13 +106,19 @@ def hough_lines(img, indicies, rhos, thetas):
         lines.append([x1, y1, x2, y2])
         cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
+# Function - Apply hough transform to image
+# Params - Canny edges list
+# Return - Indices, rhos list and thetas list
 def hough_transform(canny_img):
     n_list = non_zero_index_list(canny_img)
     H, thetas, rhos = hough_line_acc(canny_img,n_list)
-    indicies, H = hough_peaks(H, 3, nhood_size=11) 
+    indicies, H = hough_peaks(H, 3, neigbour_size=11) 
     return indicies,rhos,thetas
     
+# Function - Superimpose the road lines with scaled images
+# Params - Peak indices, rhos list, thetas list
+# Return - Superimposed image with red lines
 def superimpose(indicies, rhos, thetas):
-    shapes = cv2.imread('output/scaled-output-dashcam_view_1.jpg')
+    shapes = cv2.imread('output/scaled.jpg')
     hough_lines(shapes, indicies, rhos, thetas)
     return shapes
